@@ -166,7 +166,7 @@ infixl 3 \/
 -- Conjunción.
 (/\)  ::  Term -> Term -> Term
 (/\)  term1 term2 = And term1 term2
-infixl /\
+infixl 3 /\
 
 -- Implicación.
 (==>) :: Term -> Term -> Term
@@ -251,4 +251,10 @@ showTerm (Equ   term1    term2 ) = "(" ++ showTerm (term1) ++ ") ===  (" ++ show
 
 instance Show Term where show = showTerm
 
+showEquation :: Equation -> String
+showEquation (Ecu (Var  i) (Var  j)) = showEquation (Var i) ++ " <==> " ++ showEquation (Var j)  
+showEquation (Ecu (Var  i) term2) = showEquation (Var i) ++ " === " ++ showEquation (Var j)
+showEquation (Ecu   term1  (Var  j)) = "( " ++ showEquation (term1) ++ " ) <==> " ++ showEquation (Var j)
+
+instance Show Equation where show = showEquation
 
