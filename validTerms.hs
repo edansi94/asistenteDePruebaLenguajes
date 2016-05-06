@@ -3,7 +3,12 @@
 
 
 -- Definición de los términos válidos.
-data Term = Var Char 
+data Term = Var Char         -- Termino unitario.
+		  | Or  Term Term    -- Conjunción de términos.
+		  | And Term Term    -- Disjunción de términos.
+		  | Imp Term Term    -- Implicación de términos.
+		  | Equ Term Term    -- Equivalencia de términos.
+		  | InEqu Term Term  -- Inequivalencia de términos.
 
 -- Descripción:
 --		Permite ayudar a la impresión de los terminos definidos.
@@ -92,3 +97,26 @@ y = Var 'y'
 
 z :: Term
 z = Var 'z'
+
+-- Definición del conjunto de operadores infijos a utilizar en los enunciados de
+-- la lógica proposicional.
+
+-- Conjunción.
+(\/) ::  Term -> Term -> Term
+(\/) term1 term2 = Or term1 term2
+
+-- Disjunción.
+(/\) ::  Term -> Term -> Term
+(/\) term1 term2 = And term1 term2
+
+-- Implicación.
+(\==>) :: Term -> Term -> Term
+(\==>) term1 term2 = Imp term1 term2
+
+-- Equivalencia.
+(\<==>) :: Term -> Term -> Term
+(\<==>) term1 term2 = Equ term1 term2
+
+-- Inequivalencia.
+(\!<==>) :: Term -> Term -> Term
+(\!<==>) term1 term2 = InEqu term1 term2
