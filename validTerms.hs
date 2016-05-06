@@ -11,14 +11,30 @@ data Term = Var Char         -- Termino unitario.
 		  | InEqu Term Term  -- Inequivalencia de términos.
 
 -- Descripción:
+--
+
+--obtainChar :: Term -> Char
+--obtainChar (Var i) = i
+
+--imprimeChar :: Char -> IO ()
+--imprimeChar ' '   = return ()      -- Si el caracter es nulo se devuelve la unidad.
+--imprimeChar value = putChar value  -- Si el caracter no es nulo se imprime el caracter. 
+
+
+-- Descripción:
 --		Permite ayudar a la impresión de los terminos definidos.
 showTerm :: Term -> String
-showTerm (Var i) = show i                                                                        -- Caso: termino unitario.  
-showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ "\\/" ++ showTerm (Var j)                    -- Caso: Conjunción.   
-showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ "\\/ (" ++ showTerm (term2) ++ ")"
+showTerm (Var i) =  i:[]                                                                        -- Caso: termino unitario.  
+showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/" ++ showTerm (Var j)                    -- Caso: Conjunción.   
+showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ " \\/  (" ++ showTerm (term2) ++ ")"
 showTerm (Or  term1  (Var j)) = "(" ++ showTerm (term1) ++  ") " ++ "\\/" ++ showTerm (Var j)
 showTerm (Or  term1   term2)  = "(" ++ showTerm (term1) ++ ") \\/ (" ++ showTerm (term2) ++ ")"
 
+putStr' :: String -> IO ()
+putStr' [] = return ()
+putStr' (x:xs) = do 
+					putChar x
+					putStr xs
 
 instance Show Term where show = showTerm
 
@@ -125,3 +141,9 @@ z = Var 'z'
 -- Inequivalencia.
 (\!<==>) :: Term -> Term -> Term
 (\!<==>) term1 term2 = InEqu term1 term2
+
+main = do
+	--putStrLn "Probando..."
+	--putChar 'A'
+	let prueba =  show (a \/ b)
+	putStr (prueba)
