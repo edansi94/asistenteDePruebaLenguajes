@@ -13,7 +13,12 @@ data Term = Var Char         -- Termino unitario.
 -- Descripción:
 --		Permite ayudar a la impresión de los terminos definidos.
 showTerm :: Term -> String
-showTerm (Var i) = show i
+showTerm (Var i) = show i                                                                        -- Caso: termino unitario.  
+showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ "\\/" ++ showTerm (Var j)                    -- Caso: Conjunción.   
+showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ "\\/ (" ++ showTerm (term2) ++ ")"
+showTerm (Or  term1  (Var j)) = "(" ++ showTerm (term1) ++  ") " ++ "\\/" ++ showTerm (Var j)
+showTerm (Or  term1   term2)  = "(" ++ showTerm (term1) ++ ") \\/ (" ++ showTerm (term2) ++ ")"
+
 
 instance Show Term where show = showTerm
 
