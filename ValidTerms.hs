@@ -1,8 +1,34 @@
--- TODO:
--- * Ver forma de como quitar las comillas simples.
+-- *****************************************************************************
 
+-- Universidad Simón Bolívar.
+-- Departamento de Computación y Tecnología de la Información.
+-- Laboratorio de Lenguajes de Programación.
+-- Abril - Julio 2016.
+-- Alumnos:
+-- 			Cinthya Ramos.    09-11237.
+-- 			Edward Fernández. 10-11121.
 
--- Definición de los términos válidos.
+-- Descripción:
+-- 		Archivo en el que se definirán los diferentes términos válidos que
+--  	forman parte del lenguaje de proposiciones lógicas.
+
+-- *****************************************************************************
+
+-- Se define el módulo que permitirá importar los términos definidos en el archivo
+-- "Functions.hs".
+module ValidTerms
+(
+	Term,
+	showTerm,
+	a, b, c, d, e, f, g, h, i,
+	j, k, l, m, n, o, p, q, r,
+	s, t, u, v, w, x, y, z,
+	(\/), (/\), (\==>), (\<==>), (\!<==>)
+) where
+
+-- .............................................................................
+
+-- Definición de los términos válidos del lenguaje de proposiciones lógicas.
 data Term = Var Char         -- Termino unitario.
 		  | Or  Term Term    -- Conjunción de términos.
 		  | And Term Term    -- Disjunción de términos.
@@ -10,33 +36,19 @@ data Term = Var Char         -- Termino unitario.
 		  | Equ Term Term    -- Equivalencia de términos.
 		  | InEqu Term Term  -- Inequivalencia de términos.
 
--- Descripción:
---
-
---obtainChar :: Term -> Char
---obtainChar (Var i) = i
-
---imprimeChar :: Char -> IO ()
---imprimeChar ' '   = return ()      -- Si el caracter es nulo se devuelve la unidad.
---imprimeChar value = putChar value  -- Si el caracter no es nulo se imprime el caracter. 
-
 
 -- Descripción:
---		Permite ayudar a la impresión de los terminos definidos.
+--		Permite darle estilo a la impresión de los diferentes términos del lenguaje.
 showTerm :: Term -> String
 showTerm (Var i) =  i:[]                                                                        -- Caso: termino unitario.  
-showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/" ++ showTerm (Var j)                    -- Caso: Conjunción.   
+showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/" ++ showTerm (Var j)                  -- Caso: Conjunción.   
 showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ " \\/  (" ++ showTerm (term2) ++ ")"
 showTerm (Or  term1  (Var j)) = "(" ++ showTerm (term1) ++  ") " ++ "\\/" ++ showTerm (Var j)
 showTerm (Or  term1   term2)  = "(" ++ showTerm (term1) ++ ") \\/ (" ++ showTerm (term2) ++ ")"
 
-putStr' :: String -> IO ()
-putStr' [] = return ()
-putStr' (x:xs) = do 
-					putChar x
-					putStr xs
-
 instance Show Term where show = showTerm
+
+-- .............................................................................
 
 -- Definición de las variables que se utilizán para representar la lógica 
 -- proposicional.
@@ -119,9 +131,10 @@ y = Var 'y'
 z :: Term
 z = Var 'z'
 
+-- .............................................................................
+
 -- Definición del conjunto de operadores infijos a utilizar en los enunciados de
 -- la lógica proposicional.
-
 -- Conjunción.
 (\/) ::  Term -> Term -> Term
 (\/) term1 term2 = Or term1 term2
@@ -142,8 +155,4 @@ z = Var 'z'
 (\!<==>) :: Term -> Term -> Term
 (\!<==>) term1 term2 = InEqu term1 term2
 
-main = do
-	--putStrLn "Probando..."
-	--putChar 'A'
-	let prueba =  show (a \/ b)
-	putStr (prueba)
+-- .............................................................................
