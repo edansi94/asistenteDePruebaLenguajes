@@ -41,9 +41,9 @@ data Term = Var Char         -- Termino unitario.
 --		Permite darle estilo a la impresión de los diferentes términos del lenguaje.
 showTerm :: Term -> String
 showTerm (Var i) =  i:[]                                                                        -- Caso: termino unitario.  
-showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/" ++ showTerm (Var j)                  -- Caso: Conjunción.   
-showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ " \\/  (" ++ showTerm (term2) ++ ")"
-showTerm (Or  term1  (Var j)) = "(" ++ showTerm (term1) ++  ") " ++ "\\/" ++ showTerm (Var j)
+showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/ " ++ showTerm (Var j)                 -- Caso: Conjunción.   
+showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ " \\/ (" ++ showTerm (term2) ++ ")"
+showTerm (Or  term1  (Var j)) = "(" ++ showTerm (term1) ++ ") \\/ " ++ showTerm (Var j)
 showTerm (Or  term1   term2)  = "(" ++ showTerm (term1) ++ ") \\/ (" ++ showTerm (term2) ++ ")"
 
 instance Show Term where show = showTerm
