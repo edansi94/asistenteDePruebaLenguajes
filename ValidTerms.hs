@@ -23,28 +23,40 @@ module ValidTerms
 	a, b, c, d, e, f, g, h, i,
 	j, k, l, m, n, o, p, q, r,
 	s, t, u, v, w, x, y, z,
-	(\/), (/\), (\==>), (\<==>), (\!<==>)
+	true, false,
+	(\/), (/\), (\==>), (\<==>), (\!<==>), (\!)
 ) where
 
 -- .............................................................................
 
 -- Definición de los términos válidos del lenguaje de proposiciones lógicas.
 data Term = Var Char         -- Termino unitario.
-		  | Or  Term Term    -- Conjunción de términos.
-		  | And Term Term    -- Disjunción de términos.
+		  | Or  Term Term    -- Disjunción de términos.
+		  | And Term Term    -- Conjunción de términos.
 		  | Imp Term Term    -- Implicación de términos.
 		  | Equ Term Term    -- Equivalencia de términos.
 		  | InEqu Term Term  -- Inequivalencia de términos.
+		  | Neg	Term    	 -- Negacion de términos.
+		  | Bool Bool		 -- Términos booleanos.
 
 
 -- Descripción:
 --		Permite darle estilo a la impresión de los diferentes términos del lenguaje.
 showTerm :: Term -> String
-showTerm (Var i) =  i:[]                                                                        -- Caso: termino unitario.  
-showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/ " ++ showTerm (Var j)                 -- Caso: Conjunción.   
+showTerm (Var i) =  i:[]																		-- Caso: termino unitario. 
+
+showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/ " ++ showTerm (Var j)                 -- Caso: Disjunción.  
 showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ " \\/ (" ++ showTerm (term2) ++ ")"
 showTerm (Or  term1  (Var j)) = "(" ++ showTerm (term1) ++ ") \\/ " ++ showTerm (Var j)
+showTerm (Or (Bool x) (Bool y)) = showTerm (Bool x) ++ " \\/ " ++ showTerm (Bool y)
+showTerm (Or (Bool x)  term2 ) = showTerm (Bool x) ++ " \\/ (" ++ showTerm (term2) ++ ")"
+showTerm (Or  term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") \\/ " ++ showTerm (Bool y)
 showTerm (Or  term1   term2)  = "(" ++ showTerm (term1) ++ ") \\/ (" ++ showTerm (term2) ++ ")"
+
+--showTerm (And (Var i) (Var j)) = showTerm (Var i) ++ " \/\\ " ++ showTerm (Var j)                 -- Caso: Conjunción.   
+--showTerm (And (Var i)  term2 ) = showTerm (Var i) ++ " \/\\  (" ++ showTerm (term2) ++ ")"
+--showTerm (And  term1  (Var j)) = "(" ++ showTerm (term1) ++ ") \/\\  " ++ showTerm (Var j)
+--showTerm (And  term1   term2)  = "(" ++ showTerm (term1) ++ ") \/\\  (" ++ showTerm (term2) ++ ")"
 
 instance Show Term where show = showTerm
 
@@ -131,20 +143,26 @@ y = Var 'y'
 z :: Term
 z = Var 'z'
 
+true :: Term
+true = Bool True
+
+false :: Term
+false = Bool False
+
 -- .............................................................................
 
 -- Definición del conjunto de operadores infijos a utilizar en los enunciados de
 -- la lógica proposicional.
--- Conjunción.
-(\/) ::  Term -> Term -> Term
+-- Disjunción.
+(\/) 	::  Term -> Term -> Term
 (\/) term1 term2 = Or term1 term2
 
--- Disjunción.
-(/\) ::  Term -> Term -> Term
+-- Conjunción.
+(/\) 	::  Term -> Term -> Term
 (/\) term1 term2 = And term1 term2
 
 -- Implicación.
-(\==>) :: Term -> Term -> Term
+(\==>)  :: Term -> Term -> Term
 (\==>) term1 term2 = Imp term1 term2
 
 -- Equivalencia.
@@ -154,5 +172,9 @@ z = Var 'z'
 -- Inequivalencia.
 (\!<==>) :: Term -> Term -> Term
 (\!<==>) term1 term2 = InEqu term1 term2
+
+-- Negación.
+(\!)	 :: Term -> Term
+(\!)  term1 = Neg term1
 
 -- .............................................................................
