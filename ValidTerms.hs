@@ -1,7 +1,4 @@
 -- TO DO:
--- 		+ Agregar casos de impresión de la implicación.
--- 		+ Agregar casos de impresión de la equivalencia.
--- 		+ Agregar casos de impresión de la inequivalencia.
 --      + Agregar el operador infijo ===.
 -- 		+ Agregar precedencia.
 --      + Definir si es infijo o no.
@@ -31,9 +28,9 @@ module ValidTerms
 	a, b, c, d, e, f, g, h, i,
 	j, k, l, m, n, o, p, q, r,
 	s, t, u, v, w, x, y, z,
-	true, false,
+	true, false, neg,
 	(\/), (/\), (==>), (<==>), 
-	(!<==>), neg
+	(!<==>),
 ) where
 
 -- .............................................................................
@@ -42,15 +39,15 @@ import Data.Char (toLower) -- Se importa la librería que transforma todas las
 						   -- letras a minúsculas.
 
 -- Definición de los términos válidos del lenguaje de proposiciones lógicas.
-data Term = Var Char         -- Termino unitario.er.
-		  | Or  Term Term    -- Disjunción de términos.
-		  | And Term Term    -- Conjunción de términos.
-		  | Imp Term Term    -- Implicación de términos.
-		  | Equ Term Term    -- Equivalencia de términos.
-		  | InEqu Term Term  -- Inequivalencia de términos.
-		  | Neg	Term    	 -- Negacion de términos.
-		  | Bool Bool		 -- Términos booleanos.
-
+data Term = Var Char          -- Termino unitario.
+		  | Bool Bool		  -- Términos booleanos.
+		  | Neg	Term    	  -- Negacion de términos.
+		  | Or  Term Term     -- Disjunción de términos.
+		  | And Term Term     -- Conjunción de términos.
+		  | Imp Term Term     -- Implicación de términos.
+		  | SiYSi Term Term   -- Si y sólo sí de términos.
+		  | NoSiYSi Term Term -- Negación de si y sólo sí de términos.
+		  | Equ Term Term  	  -- Equivalencía de términos
 
 -- Descripción:
 --		Permite darle estilo a la impresión de los diferentes términos del lenguaje.
@@ -82,22 +79,30 @@ showTerm (Imp (Bool x) (Bool y)) = showTerm (Bool x) ++ " ==> " ++ showTerm (Boo
 showTerm (Imp   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") ==> " ++ showTerm (Bool y)         --      d.5: Un término compuesto implica un booleano.
 showTerm (Imp (Bool x)   term2 ) = showTerm (Bool x) ++ " ==> (" ++ showTerm (term2) ++ ")"         --      d.6: Un booleano implica un termino compuesto.
 showTerm (Imp   term1    term2 ) = "(" ++ showTerm (term1) ++ ") ==>  (" ++ showTerm (term2) ++ ")" --      d.7: Un término compuesto implica un término compuesto. 
-																									-- Caso e: Equivalencia.
-showTerm (Equ (Var  i) (Var  j)) = showTerm (Var i) ++ " <==> " ++ showTerm (Var j)                 --      e.1: Un término unitario equivale un término unitario.
-showTerm (Equ (Var  i)   term2 ) = showTerm (Var i) ++ " <==> (" ++ showTerm (term2) ++ ")"         --      e.2: Un término unitario equivale un término compuesto.
-showTerm (Equ   term1  (Var  j)) = "( " ++ showTerm (term1) ++ " ) <==> " ++ showTerm (Var j)       --      e.3: Un término compuesto equivale un término unitario.
-showTerm (Equ (Bool x) (Bool y)) = showTerm (Bool x) ++ " <==> " ++ showTerm (Bool y)			    --      e.4: Un término booleano equivale un término booleano.
-showTerm (Equ   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") <==> " ++ showTerm (Bool y)        --      e.5: Un término compuesto equivale un booleano.
-showTerm (Equ (Bool x)   term2 ) = showTerm (Bool x) ++ " <==> (" ++ showTerm (term2) ++ ")"        --      e.6: Un booleano equivale un termino compuesto.
-showTerm (Equ   term1    term2 ) = "(" ++ showTerm (term1) ++ ") <==>  (" ++ showTerm (term2) ++ ")"--      e.7: Un término compuesto equivale un término compuesto. 
-																									-- Caso f: Inequivalencia.
-showTerm (InEqu (Var  i) (Var  j)) = showTerm (Var i) ++ " !<==> " ++ showTerm (Var j)                  --  f.1: Un término unitario no equivale a un término unitario.
-showTerm (InEqu (Var  i)   term2 ) = showTerm (Var i) ++ " !<==> (" ++ showTerm (term2) ++ ")"          --  f.2: Un término unitario no equivale a un término compuesto.
-showTerm (InEqu   term1  (Var  j)) = "( " ++ showTerm (term1) ++ " ) !<==> " ++ showTerm (Var j)        --  f.3: Un término compuesto no equivale a un término unitario.
-showTerm (InEqu (Bool x) (Bool y)) = showTerm (Bool x) ++ " !<==> " ++ showTerm (Bool y)			    --  f.4: Un término booleano no equivale a un término booleano.
-showTerm (InEqu   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") !<==> " ++ showTerm (Bool y)         --  f.5: Un término compuesto no equivale a un booleano.
-showTerm (InEqu (Bool x)   term2 ) = showTerm (Bool x) ++ " !<==> (" ++ showTerm (term2) ++ ")"         --  f.6: Un booleano no equivale a un termino compuesto.
-showTerm (InEqu   term1    term2 ) = "(" ++ showTerm (term1) ++ ") !<==>  (" ++ showTerm (term2) ++ ")" --  f.7: Un término compuesto no equivale a un término compuesto. 
+																									-- Caso e: Si y sólo sí.
+showTerm (SiYSi (Var  i) (Var  j)) = showTerm (Var i) ++ " <==> " ++ showTerm (Var j)                  --  e.1: Un término unitario si y sólo sí un término unitario.
+showTerm (SiYSi (Var  i)   term2 ) = showTerm (Var i) ++ " <==> (" ++ showTerm (term2) ++ ")"          --  e.2: Un término unitario si y sólo sí un término compuesto.
+showTerm (SiYSi   term1  (Var  j)) = "( " ++ showTerm (term1) ++ " ) <==> " ++ showTerm (Var j)        --  e.3: Un término compuesto si y sólo sí un término unitario.
+showTerm (SiYSi (Bool x) (Bool y)) = showTerm (Bool x) ++ " <==> " ++ showTerm (Bool y)			       --  e.4: Un término booleano si y sólo sí un término booleano.
+showTerm (SiYSi   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") <==> " ++ showTerm (Bool y)         --  e.5: Un término compuesto si y sólo sí un booleano.
+showTerm (SiYSi (Bool x)   term2 ) = showTerm (Bool x) ++ " <==> (" ++ showTerm (term2) ++ ")"         --  e.6: Un booleano si y sólo sí un termino compuesto.
+showTerm (SiYSi   term1    term2 ) = "(" ++ showTerm (term1) ++ ") <==>  (" ++ showTerm (term2) ++ ")" --  e.7: Un término compuesto si y sólo sí término compuesto. 
+																									-- Caso f: No si y sólo sí.
+showTerm (NoSiYSi (Var  i) (Var  j)) = showTerm (Var i) ++ " !<==> " ++ showTerm (Var j)                 -- f.1: Un término unitario no si y sólo sí un término unitario.
+showTerm (NoSiYSi (Var  i)   term2 ) = showTerm (Var i) ++ " !<==> (" ++ showTerm (term2) ++ ")"         -- f.2: Un término unitario no si y sólo sí un término compuesto.
+showTerm (NoSiYSi   term1  (Var  j)) = "( " ++ showTerm (term1) ++ " ) !<==> " ++ showTerm (Var j)       -- f.3: Un término compuesto no si y sólo sí un término unitario.
+showTerm (NoSiYSi (Bool x) (Bool y)) = showTerm (Bool x) ++ " !<==> " ++ showTerm (Bool y)			     -- f.4: Un término booleano no si y sólo sí un término booleano.
+showTerm (NoSiYSi   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") !<==> " ++ showTerm (Bool y)        -- f.5: Un término compuesto no si y sólo sí un booleano.
+showTerm (NoSiYSi (Bool x)   term2 ) = showTerm (Bool x) ++ " !<==> (" ++ showTerm (term2) ++ ")"        -- f.6: Un booleano no si y sólo sí un termino compuesto.
+showTerm (NoSiYSi   term1    term2 ) = "(" ++ showTerm (term1) ++ ") !<==>  (" ++ showTerm (term2) ++ ")"-- f.7: Un término compuesto no si y sólo sí un término compuesto. 
+																									-- Caso g: Equivalencia.
+showTerm (Equ (Var  i) (Var  j)) = showTerm (Var i) ++ " === " ++ showTerm (Var j)                  --      g.1: Un término unitario equivale un término unitario.
+showTerm (Equ (Var  i)   term2 ) = showTerm (Var i) ++ " === (" ++ showTerm (term2) ++ ")"          --      g.2: Un término unitario equivale un término compuesto.
+showTerm (Equ   term1  (Var  j)) = "( " ++ showTerm (term1) ++ " ) === " ++ showTerm (Var j)        --      g.3: Un término compuesto equivale un término unitario.
+showTerm (Equ (Bool x) (Bool y)) = showTerm (Bool x) ++ " === " ++ showTerm (Bool y)			    --      g.4: Un término booleano equivale un término booleano.
+showTerm (Equ   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") === " ++ showTerm (Bool y)         --      g.5: Un término compuesto equivale un booleano.
+showTerm (Equ (Bool x)   term2 ) = showTerm (Bool x) ++ " === (" ++ showTerm (term2) ++ ")"         --      g.6: Un booleano equivale un termino compuesto.
+showTerm (Equ   term1    term2 ) = "(" ++ showTerm (term1) ++ ") ===  (" ++ showTerm (term2) ++ ")" --      g.7: Un término compuesto equivale un término compuesto. 
 
 instance Show Term where show = showTerm
 
@@ -194,28 +199,32 @@ false = Bool False
 
 -- Definición del conjunto de operadores infijos a utilizar en los enunciados de
 -- la lógica proposicional.
--- Disjunción.
-(\/) 	::  Term -> Term -> Term
-(\/) term1 term2 = Or term1 term2
-
--- Conjunción.
-(/\) 	::  Term -> Term -> Term
-(/\) term1 term2 = And term1 term2
-
--- Implicación.
-(==>)  :: Term -> Term -> Term
-(==>) term1 term2 = Imp term1 term2
-
--- Equivalencia.
-(<==>) :: Term -> Term -> Term
-(<==>) term1 term2 = Equ term1 term2
-
--- Inequivalencia.
-(!<==>) :: Term -> Term -> Term
-(!<==>) term1 term2 = InEqu term1 term2
 
 -- Negación.
-neg	 :: Term -> Term
-neg  term1 = Neg term1
+neg	  :: Term -> Term
+neg   term1 = Neg term1
+
+-- Disjunción
+(\/)  ::  Term -> Term -> Term
+(\/)  term1 term2 = Or term1 term2
+
+-- Conjunción.
+(/\)  ::  Term -> Term -> Term
+(/\)  term1 term2 = And term1 term2
+
+-- Implicación.
+(==>) :: Term -> Term -> Term
+(==>) term1 term2 = Imp term1 term2
+
+-- Si y sólo sí.
+(<==>) :: Term -> Term -> Term
+(<==>) term1 term2 = SiYSi term1 term2
+
+-- Negación de si y sólo sí.
+(!<==>) :: Term -> Term -> Term
+(!<==>) term1 term2 = NoSiYSi term1 term2
+
+-- Equivalencia.
+--(===)  :: Term -> Term -> Equation
 
 -- .............................................................................
