@@ -1,3 +1,11 @@
+-- TO DO:
+-- 		+ Agregar casos de impresión de la implicación.
+-- 		+ Agregar casos de impresión de la equivalencia.
+-- 		+ Agregar casos de impresión de la inequivalencia.
+--      + Agregar el operador infijo ===.
+-- 		+ Agregar precedencia.
+--      + Definir si es infijo o no.
+--      + Revisar que falta.
 -- *****************************************************************************
 
 -- Universidad Simón Bolívar.
@@ -66,6 +74,9 @@ showTerm (And (Bool x) (Bool y)) = showTerm (Bool x) ++ " /\\ " ++ showTerm (Boo
 showTerm (And   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") /\\ " ++ showTerm (Bool y)         --      c.5: Un término compuesto y un booleano.
 showTerm (And (Bool x)   term2 ) = showTerm (Bool x) ++ " /\\ (" ++ showTerm (term2) ++ ")"         --      c.6: Un booleano y un termino compuesto.
 showTerm (And   term1    term2 ) = "(" ++ showTerm (term1) ++ ") /\\  (" ++ showTerm (term2) ++ ")" --      c.7: Dos términos compuestos. 
+																									-- Caso d: Implicación.
+																									-- Caso e: Equivalencia.
+																									-- Caso f: Inequivalencia.
 
 instance Show Term where show = showTerm
 
