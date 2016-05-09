@@ -24,13 +24,17 @@ module ValidTerms
 	j, k, l, m, n, o, p, q, r,
 	s, t, u, v, w, x, y, z,
 	true, false,
-	(\/), (/\), (\==>), (\<==>), (\!<==>), (\!)
+	(\/), (/\), (\==>), (\<==>), 
+	(\!<==>), (\!)
 ) where
 
 -- .............................................................................
 
+import Data.Char (toLower) -- Se importa la librería que transforma todas las 
+						   -- letras a minúsculas.
+
 -- Definición de los términos válidos del lenguaje de proposiciones lógicas.
-data Term = Var Char         -- Termino unitario.
+data Term = Var Char         -- Termino unitario.er.
 		  | Or  Term Term    -- Disjunción de términos.
 		  | And Term Term    -- Conjunción de términos.
 		  | Imp Term Term    -- Implicación de términos.
@@ -43,20 +47,25 @@ data Term = Var Char         -- Termino unitario.
 -- Descripción:
 --		Permite darle estilo a la impresión de los diferentes términos del lenguaje.
 showTerm :: Term -> String
-showTerm (Var i) =  i:[]																		-- Caso: termino unitario. 
-
-showTerm (Or (Var i) (Var j)) = showTerm (Var i) ++ " \\/ " ++ showTerm (Var j)                 -- Caso: Disjunción.  
-showTerm (Or (Var i)  term2 ) = showTerm (Var i) ++ " \\/ (" ++ showTerm (term2) ++ ")"
-showTerm (Or  term1  (Var j)) = "(" ++ showTerm (term1) ++ ") \\/ " ++ showTerm (Var j)
-showTerm (Or (Bool x) (Bool y)) = showTerm (Bool x) ++ " \\/ " ++ showTerm (Bool y)
-showTerm (Or (Bool x)  term2 ) = showTerm (Bool x) ++ " \\/ (" ++ showTerm (term2) ++ ")"
-showTerm (Or  term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") \\/ " ++ showTerm (Bool y)
-showTerm (Or  term1   term2)  = "(" ++ showTerm (term1) ++ ") \\/ (" ++ showTerm (term2) ++ ")"
-
---showTerm (And (Var i) (Var j)) = showTerm (Var i) ++ " \/\\ " ++ showTerm (Var j)                 -- Caso: Conjunción.   
---showTerm (And (Var i)  term2 ) = showTerm (Var i) ++ " \/\\  (" ++ showTerm (term2) ++ ")"
---showTerm (And  term1  (Var j)) = "(" ++ showTerm (term1) ++ ") \/\\  " ++ showTerm (Var j)
---showTerm (And  term1   term2)  = "(" ++ showTerm (term1) ++ ") \/\\  (" ++ showTerm (term2) ++ ")"
+																								    -- Caso a: término unitario.
+showTerm (Var  i) =  i:[]																		    --      a.1: Caracter.
+showTerm (Bool i) =  map toLower (show i)          									    	        --	   a.2: Booleano  
+																								    -- Caso b: Disjunción.
+showTerm (Or (Var  i) (Var  j)) = showTerm (Var i) ++ " \\/ " ++ showTerm (Var j)                   --      b.1: Dos términos unitarios.       
+showTerm (Or (Var  i)   term2 ) = showTerm (Var i) ++ " \\/ (" ++ showTerm (term2) ++ ")" 		    --      b.2: Término unitario o termino compuesto.
+showTerm (Or   term1  (Var  j)) = "(" ++ showTerm (term1) ++ ") \\/ " ++ showTerm (Var j)           --      b.3: Término compuesto o término unitario.
+showTerm (Or (Bool x) (Bool y)) = showTerm (Bool x) ++ " \\/ " ++ showTerm (Bool y)				    --      b.4: Dos términos booleanos.
+showTerm (Or   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") \\/ " ++ showTerm (Bool y)          --      b.5: Un término compuesto o un booleano.
+showTerm (Or (Bool x)   term2 ) = showTerm (Bool x) ++ " \\/ (" ++ showTerm (term2) ++ ")"          --      b.6: Un booleano o un termino compuesto.
+showTerm (Or   term1    term2 ) = "(" ++ showTerm (term1) ++ ") \\/ (" ++ showTerm (term2) ++ ")"   --      b.7: Dos términos compuesto.
+																								    -- Caso c: Conjunción.
+showTerm (And (Var  i) (Var  j)) = showTerm (Var i) ++ " /\\ " ++ showTerm (Var j)                  --      c.1: Dos términos unitarios.         
+showTerm (And (Var  i)   term2 ) = showTerm (Var i) ++ " /\\ (" ++ showTerm (term2) ++ ")"          --      c.2: Un término unitario y un término compuesto.
+showTerm (And   term1  (Var  j)) = "(" ++ showTerm (term1) ++ ") /\\  " ++ showTerm (Var j)         --      c.3: Un término compuesto y un término unitario.
+showTerm (And (Bool x) (Bool y)) = showTerm (Bool x) ++ " /\\ " ++ showTerm (Bool y)			    --      c.4: Dos términos booleanos.
+showTerm (And   term1  (Bool y)) = "(" ++ showTerm (term1) ++ ") /\\ " ++ showTerm (Bool y)         --      c.5: Un término compuesto y un booleano.
+showTerm (And (Bool x)   term2 ) = showTerm (Bool x) ++ " /\\ (" ++ showTerm (term2) ++ ")"         --      c.6: Un booleano y un termino compuesto.
+showTerm (And   term1    term2 ) = "(" ++ showTerm (term1) ++ ") /\\  (" ++ showTerm (term2) ++ ")" --      c.7: Dos términos compuestos. 
 
 instance Show Term where show = showTerm
 
